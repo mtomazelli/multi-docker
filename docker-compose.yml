@@ -1,0 +1,50 @@
+version: '3'
+services:
+    postgres:
+        image: 'postgres:latest'
+        environment:
+            - POSTGRES_PASSWORD=postgres_password
+    redis:
+        image: 'redis:latest'
+    nginx:
+        restart: always # esta direcionando o tráfego de toda a aplicacao, entao se der pau precisa sempre recomeçar
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./nginx
+        ports:
+            - '3050:80' # Podia ser qualquer porta para acessar do nosso localhost
+    api: # Esta na pasta server do projeto
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./server
+        volumes:
+            - /app/node_modules # Não mapeia o node_modules (só instalo ele no container)
+            - ./server:/app     # Realiza o mapeamento da minha pasta de server pra pasta do container que vai conter a copia dos arquivos
+        environment:            # Setando as variaveis de ambiente que estou usando nas aplicações
+            - REDIS_HOST=redis  # Porque eu chamei de redis o servico neste arquivo
+            - REDIS_PORT=6379   # Documentacao do redis indica essa porta
+            - PGUSER=postgres   # Documentacao do postgres indica todos os valores
+            - PGHOST=postgres
+            - PGDATABASE=postgres
+            - PGPASSWORD=postgres_password
+            - PGPORT=5432
+        depends_on:
+            - postgres
+    client:
+        stdin_open: true
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./client
+        volumes:
+            - /app/node_modules
+            - ./client:/app
+    worker:
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./worker
+        volumes:
+            - /app/node_modules
+            - ./worker:/app
+        environment:
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379   
