@@ -1,0 +1,22 @@
+sudo: required
+services:
+    - docker
+
+before_install:
+    - docker build -t mtomazelli/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+    - docker run -e CI=true mtomazelli/react-test npm test
+
+after_success:
+    - docker build -t mtomazelli/multi-client ./client
+    - docker build -t mtomazelli/multi-nginx ./nginx
+    - docker build -t mtomazelli/multi-server ./server
+    - docker build -t mtomazelli/multi-worker ./worker
+    # Logar no docker CLI
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    # Mandar essas imagens pro docker hub
+    - docker push mtomazelli/multi-client
+    - docker push mtomazelli/multi-nginx
+    - docker push mtomazelli/multi-server
+    - docker push mtomazelli/multi-worker
