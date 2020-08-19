@@ -20,3 +20,17 @@ after_success:
     - docker push mtomazelli/multi-nginx
     - docker push mtomazelli/multi-server
     - docker push mtomazelli/multi-worker
+
+# Mandar tudo pro AWS
+deploy:
+    provider: elasticbeanstalk
+    region: sa-east-1
+    app: multi-docker
+    env: MultiDocker-env
+    bucket_name: elasticbeanstalk-sa-east-1-906040740410
+    bucket_path: docker-multi
+    on:
+        branch: master
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    
