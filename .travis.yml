@@ -21,7 +21,6 @@ after_success:
     - docker push mtomazelli/multi-server
     - docker push mtomazelli/multi-worker
 
-# Mandar tudo pro AWS
 deploy:
     provider: elasticbeanstalk
     region: sa-east-1
