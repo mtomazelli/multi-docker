@@ -1,6 +1,6 @@
 {
     "AWSEBDockerrunVersion": 2,
-    "ContainersDefinitions": [
+    "containerDefinitions": [
         {
             "name": "client",
             "image": "mtomazelli/multi-client",
